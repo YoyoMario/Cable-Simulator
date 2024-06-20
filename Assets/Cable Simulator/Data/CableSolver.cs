@@ -7,8 +7,8 @@ public class CableSolver : MonoBehaviour
     public int NodeCount = 40;
     [Range(0, 0.2f)] public float NodeDistance = 0.1f;
     public float Gravity = 9.81f;
-    [Range(0.01f, 0.99f)] public float Elasticity = 1;
-    [Range(0.9f, 1.0f)] public float Dampening = 1;
+    [Range(0.01f, .9f)] public float Elasticity = 1;
+    [Range(0.9f, 1.0f)] public float GravityDampening = 1;
 
     public bool EndHandle = default;
     public Transform EndHanlePoint = default;
@@ -37,10 +37,6 @@ public class CableSolver : MonoBehaviour
 
             Gizmos.color = Color.red;
             Gizmos.DrawSphere(_cableNodes[i].CurrentPosition, 0.025f);
-
-            //Vector3 direction = nodes[i].position - nodes[i+1].position; // Towards node 1.
-            //Gizmos.color = Color.yellow;
-            //DrawArrow.ForGizmo(nodes[i].position, direction, 0.05f, 20f);
         }
         Gizmos.DrawSphere(_cableNodes[NodeCount - 1].CurrentPosition, 0.025f);
     }
@@ -63,8 +59,9 @@ public class CableSolver : MonoBehaviour
         for (int i = 0; i < NodeCount; i++)
         {
             CableNode cableNode = _cableNodes[i];
+
             Vector3 currentPosition = cableNode.CurrentPosition;
-            cableNode.CurrentPosition += ((cableNode.CurrentPosition - cableNode.OldPosition) * Dampening) + (cableNode.Velocity * Time.deltaTime);
+            cableNode.CurrentPosition += ((cableNode.CurrentPosition - cableNode.OldPosition) * GravityDampening) + (cableNode.Velocity * Time.deltaTime);
             cableNode.OldPosition = currentPosition;
         }
 
