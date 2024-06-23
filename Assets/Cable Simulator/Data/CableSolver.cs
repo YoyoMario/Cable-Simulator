@@ -5,6 +5,7 @@ public class CableSolver : MonoBehaviour
     [Header("Settings:")]
     public int SolverCount = 10;
     public int NodeCount = 40;
+    public float RopeThickness = 0.05f;
     [Range(0, 0.2f)] public float NodeDistance = 0.1f;
     public float Gravity = 9.81f;
     [Range(0.01f, .9f)] public float Elasticity = 1;
@@ -15,6 +16,8 @@ public class CableSolver : MonoBehaviour
 
     [Header("Runtime Info:")]
     [SerializeField] private CableNode[] _cableNodes = default;
+    [SerializeField] private SphereCollider _sphereCollider = default;
+    [SerializeField] private BoxCollider _boxCollider = default;
 
     private void OnDrawGizmos()
     {
@@ -52,18 +55,43 @@ public class CableSolver : MonoBehaviour
         for (int i = 0; i < NodeCount; i++)
         {
             CableNode cableNode = _cableNodes[i];
-            cableNode.Velocity = Vector3.down * Gravity * Time.deltaTime;
+            Vector3 force = Vector3.down * Gravity * cableNode.Mass;
+            cableNode.Acceleration = force / cableNode.Mass;
+            cableNode.Velocity = cableNode.CurrentPosition - cableNode.OldPosition;
         }
 
         // Gravity pass + main rope pass.
         for (int i = 0; i < NodeCount; i++)
         {
             CableNode cableNode = _cableNodes[i];
+            Vector3 newPosition = cableNode.CurrentPosition + cableNode.Velocity * GravityDampening + (cableNode.Acceleration * Time.deltaTime * Time.deltaTime * cableNode.Mass);
+            cableNode.OldPosition = cableNode.CurrentPosition;
+            cableNode.CurrentPosition = newPosition;
 
-            Vector3 currentPosition = cableNode.CurrentPosition;
-            cableNode.CurrentPosition += ((cableNode.CurrentPosition - cableNode.OldPosition) * GravityDampening) + (cableNode.Velocity * Time.deltaTime);
-            cableNode.OldPosition = currentPosition;
+            // Collision check.
+            ResolveSphereCollisionForSingleNode(cableNode);
+            ResolveBoxCollisionForSingleNode(cableNode);
         }
+
+        //// Check for collisions.
+        //for (int i = 0; i < NodeCount; i++)
+        //{
+        //    CableNode cableNode = _cableNodes[i];
+        //    float distance = Vector3.Distance(cableNode.CurrentPosition, _sphereCollider.transform.position);
+        //    float radius = _sphereCollider.radius;
+        //    if (distance > radius)
+        //    {
+        //        // No collision;
+        //        continue;
+        //    }
+
+        //    // Push point outside circle.
+        //    Vector3 direction = (cableNode.CurrentPosition - _sphereCollider.transform.position);
+        //    Vector3 positionOnSphere = _sphereCollider.transform.position + (direction.normalized * radius);
+        //    cableNode.CurrentPosition = positionOnSphere;
+        //    cableNode.Acceleration = Vector3.zero;
+        //    cableNode.Velocity = Vector3.zero;
+        //}
 
         // Solver.
         for (int z = 0; z < SolverCount; z++)
@@ -121,6 +149,104 @@ public class CableSolver : MonoBehaviour
             {
                 node2.CurrentPosition = EndHanlePoint.position;
             }
+
+            // Collision handling.
+            ResolveSphereCollisionForSingleNode(node1);
+            ResolveBoxCollisionForSingleNode(node1);
         }
+    }
+
+    private void ResolveSphereCollisionForSingleNode(CableNode cableNode)
+    {
+        float distance = Vector3.Distance(cableNode.CurrentPosition, _sphereCollider.transform.position);
+        float radius = _sphereCollider.radius;
+        if (distance > radius + RopeThickness / 2)
+        {
+            // No collision;
+            return;
+        }
+
+        // Push point outside circle.
+        Vector3 direction = (cableNode.CurrentPosition - _sphereCollider.transform.position);
+        Vector3 positionOnSphere = _sphereCollider.transform.position + (direction.normalized * radius) + (direction.normalized * RopeThickness / 2);
+        cableNode.CurrentPosition = positionOnSphere;
+        cableNode.Acceleration = Vector3.zero;
+        cableNode.Velocity = Vector3.zero;
+    }
+
+    private void ResolveBoxCollisionForSingleNode(CableNode cableNode)
+    {
+        Vector3 localPositionToBoxCollider = _boxCollider.transform.worldToLocalMatrix.MultiplyPoint(cableNode.CurrentPosition);
+        Vector3 halfColliderSize = _boxCollider.size * 0.5f;
+        halfColliderSize += Vector3.one * RopeThickness / 2;
+
+        Vector3 scalar = _boxCollider.transform.localScale;
+        float dx = localPositionToBoxCollider.x;
+        float px = halfColliderSize.x - Mathf.Abs(dx);
+        if (px <= 0)
+        {
+            return;
+        }
+
+        float dy = localPositionToBoxCollider.y;
+        float py = halfColliderSize.y - Mathf.Abs(dy);
+        if (py <= 0)
+        {
+            return;
+        }
+
+        float dz = localPositionToBoxCollider.z;
+        float pz = halfColliderSize.z - Mathf.Abs(dz);
+        if (pz <= 0)
+        {
+            return;
+        }
+
+        // Push node out along closest edge.
+        // Need to multiply distance by scale or we'll mess up on scaled box corners.
+        if (px * scalar.x < py * scalar.y && px * scalar.x < pz * scalar.z)
+        {
+            float sx = Mathf.Sign(dx);
+            localPositionToBoxCollider.x = halfColliderSize.x * sx;
+        }
+        else if (py * scalar.y < px * scalar.x && py * scalar.y < pz * scalar.z)
+        {
+            float sy = Mathf.Sign(dy);
+            localPositionToBoxCollider.y = halfColliderSize.y * sy;
+        }
+        else
+        {
+            float sz = Mathf.Sign(dz);
+            localPositionToBoxCollider.z = halfColliderSize.z * sz;
+        }
+
+        //// Test x.
+        //float distanceX = localPositionToBoxCollider.x;
+        //float pointX = halfColliderSize.x - Mathf.Abs(distanceX);
+        //if (pointX >= 0)
+        //{
+        //    float sx = Mathf.Sign(distanceX);
+        //    localPositionToBoxCollider.x = halfColliderSize.x * sx;
+        //}
+
+        //// Test y.
+        //float distanceY = localPositionToBoxCollider.y;
+        //float pointY = halfColliderSize.y - Mathf.Abs(distanceY);
+        //if (pointY >= 0)
+        //{
+        //    float sy = Mathf.Sign(distanceY);
+        //    localPositionToBoxCollider.y = halfColliderSize.y * sy;
+        //}
+
+        //// Test z.
+        //float distanceZ = localPositionToBoxCollider.z;
+        //float pointZ = halfColliderSize.z - Mathf.Abs(distanceZ);
+        //if (pointZ >= distanceZ)
+        //{
+        //    localPositionToBoxCollider.z = pointZ;
+        //}
+
+        Vector3 globalPositionToBoxCollider = _boxCollider.transform.localToWorldMatrix.MultiplyPoint(localPositionToBoxCollider);
+        cableNode.CurrentPosition = globalPositionToBoxCollider;
     }
 }
