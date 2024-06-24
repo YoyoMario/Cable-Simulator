@@ -1,3 +1,4 @@
+using System.Threading;
 using UnityEngine;
 
 public class CableSolver : MonoBehaviour
@@ -40,8 +41,11 @@ public class CableSolver : MonoBehaviour
 
             Gizmos.color = Color.red;
             Gizmos.DrawSphere(_cableNodes[i].CurrentPosition, 0.025f);
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(_cableNodes[i].CurrentPosition, 0.025f + RopeThickness / 2f);
         }
         Gizmos.DrawSphere(_cableNodes[NodeCount - 1].CurrentPosition, 0.025f);
+        Gizmos.DrawSphere(_cableNodes[NodeCount - 1].CurrentPosition, 0.025f + RopeThickness / 2f);
     }
 
     private void Start()
@@ -49,7 +53,7 @@ public class CableSolver : MonoBehaviour
         InitializeCable();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         // Calculate gravity velocity.
         for (int i = 0; i < NodeCount; i++)
@@ -73,30 +77,36 @@ public class CableSolver : MonoBehaviour
             ResolveBoxCollisionForSingleNode(cableNode);
         }
 
-        //// Check for collisions.
-        //for (int i = 0; i < NodeCount; i++)
-        //{
-        //    CableNode cableNode = _cableNodes[i];
-        //    float distance = Vector3.Distance(cableNode.CurrentPosition, _sphereCollider.transform.position);
-        //    float radius = _sphereCollider.radius;
-        //    if (distance > radius)
-        //    {
-        //        // No collision;
-        //        continue;
-        //    }
-
-        //    // Push point outside circle.
-        //    Vector3 direction = (cableNode.CurrentPosition - _sphereCollider.transform.position);
-        //    Vector3 positionOnSphere = _sphereCollider.transform.position + (direction.normalized * radius);
-        //    cableNode.CurrentPosition = positionOnSphere;
-        //    cableNode.Acceleration = Vector3.zero;
-        //    cableNode.Velocity = Vector3.zero;
-        //}
+        // Resolve self collision.
+        ResolveCollisionBetweenCables(_cableNodes, _cableNodes);
 
         // Solver.
         for (int z = 0; z < SolverCount; z++)
         {
-            ResolveNodePositions();
+            SatisfyConstrains();
+            ResolveCollisionBetweenCables(_cableNodes, _cableNodes);
+        }
+    }
+      public float MinRadius = 0.2f;
+
+    private void ResolveCollisionBetweenCables(CableNode[] cable1, CableNode[] cable2)
+    {
+        for (int i = 0; i < cable1.Length; i++)
+        {
+            for (int j = i + 1; j < cable2.Length; j++)
+            {
+                Vector3 delta = cable2[j].CurrentPosition - cable1[i].CurrentPosition;
+                float distance = Vector3.Distance(cable2[j].CurrentPosition, cable1[i].CurrentPosition);
+                float minDistance = MinRadius * 2;
+
+                if (distance < minDistance)
+                {
+                    Vector3 direction = delta / distance;
+                    float correction = (minDistance - distance) / 2;
+                    cable1[i].CurrentPosition -= direction * correction;
+                    cable2[j].CurrentPosition += direction * correction;
+                }
+            }
         }
     }
 
@@ -110,7 +120,7 @@ public class CableSolver : MonoBehaviour
         }
     }
 
-    private void ResolveNodePositions()
+    private void SatisfyConstrains()
     {
         for (int i = 0; i < NodeCount - 1; i++)
         {
