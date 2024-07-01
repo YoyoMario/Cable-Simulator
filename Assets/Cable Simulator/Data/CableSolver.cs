@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using UnityEngine;
 
@@ -57,6 +58,8 @@ public class CableSolver : MonoBehaviour
 
             Gizmos.color = Color.red;
             Gizmos.DrawSphere(_cableNodes[i].CurrentPosition, 0.025f);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(_cableNodes[i].wantedPosition, 0.02f);
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(_cableNodes[i].CurrentPosition, 0.025f + RopeThickness / 2f);
             Gizmos.color = Color.cyan;
@@ -72,7 +75,7 @@ public class CableSolver : MonoBehaviour
     private bool _isRunning = default;
 
     private CustomSphereCollider[] _customSphereColliders = default;
-    private CustomBoxCollider[] _customBoxColliders= default;
+    private CustomBoxCollider[] _customBoxColliders = default;
 
     private void Start()
     {
@@ -173,25 +176,13 @@ public class CableSolver : MonoBehaviour
         for (int i = 0; i < NodeCount; i++)
         {
             CableNode cableNode = _cableNodes[i];
-
-            // Collision check.
-            ResolveSphereCollisionForSingleNode(cableNode);
-            ResolveBoxCollisionForSingleNode(cableNode);
-
             Vector3 newPosition = cableNode.CurrentPosition + (cableNode.Velocity * GravityDampening) + (cableNode.Acceleration * cableNode.Mass);
             cableNode.OldPosition = cableNode.CurrentPosition;
             cableNode.CurrentPosition = newPosition;
 
-
-            // Special case.
-            //if (i == 0)
-            //{
-            //    cableNode.CurrentPosition = transform.position;
-            //}
-            //if (EndHandle && i == NodeCount - 1)
-            //{
-            //    cableNode.CurrentPosition = EndHanlePoint.position;
-            //}
+            // Collision check.
+            ResolveSphereCollisionForSingleNode(cableNode);
+            ResolveBoxCollisionForSingleNode(cableNode);
         }
 
         // Resolve self collision.
@@ -233,8 +224,49 @@ public class CableSolver : MonoBehaviour
         for (int i = 0; i < NodeCount; i++)
         {
             Vector3 nodeStartPosition = transform.position + (Vector3.down * NodeDistance * i);
-            _cableNodes[i] = new CableNode(nodeStartPosition);
+            _cableNodes[i] = new CableNode(nodeStartPosition, NodeDistance);
         }
+    }
+
+    [ContextMenu("Ide gas")]
+    public void InsertNode()
+    {
+        CableNode cableNode = _cableNodes[30];
+        CableNode newObject = new CableNode(cableNode.CurrentPosition, 0.1f);
+        _cableNodes = InsertAtIndex<CableNode>(_cableNodes, newObject, 30);
+        NodeCount++;
+    }
+
+    public static T[] InsertAtIndex<T>(T[] array, T newObject, int index)
+    {
+        if (array == null)
+        {
+            throw new ArgumentNullException(nameof(array), "Array cannot be null.");
+        }
+
+        if (index < 0 || index > array.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+        }
+
+        T[] newArray = new T[array.Length + 1];
+
+        // Copy elements before the index
+        for (int i = 0; i < index; i++)
+        {
+            newArray[i] = array[i];
+        }
+
+        // Insert new object at the specified index
+        newArray[index] = newObject;
+
+        // Copy elements after the index
+        for (int i = index; i < array.Length; i++)
+        {
+            newArray[i + 1] = array[i];
+        }
+
+        return newArray;
     }
 
     private void SatisfyConstrains()
@@ -254,9 +286,6 @@ public class CableSolver : MonoBehaviour
                 node2.CurrentPosition = otherHandle;
             }
 
-            // Collision handling.
-            float multiplier =  ResolveSphereCollisionForSingleNode(node1);
-            ResolveBoxCollisionForSingleNode(node1);
 
             Vector3 direction = node1.CurrentPosition - node2.CurrentPosition; // Towards Node 1.
             float distance = Vector3.Distance(node1.CurrentPosition, node2.CurrentPosition);
@@ -264,28 +293,33 @@ public class CableSolver : MonoBehaviour
             float pushPullStrength = default;
             if (distance > 0)
             {
-                pushPullStrength = (NodeDistance - distance) / distance;
+                pushPullStrength = (node1.NodeDistance - distance) / distance;
             }
 
-            Vector3 neededTranslation = direction * Elasticity * pushPullStrength * multiplier;
+            node1.Distance = distance;
+            node1.PushPullStrength = pushPullStrength;
+            Vector3 neededTranslation = direction * Elasticity * pushPullStrength;
             node1.CurrentPosition += neededTranslation;
             node2.CurrentPosition -= neededTranslation;
 
-            // Special case.
-            if (i == 0)
-            {
-                node1.CurrentPosition = thisHandle;
-            }
-            if (EndHandle && i == NodeCount - 2)
-            {
-                node2.CurrentPosition = otherHandle;
-            }
+            //// Special case.
+            //if (i == 0)
+            //{
+            //    node1.CurrentPosition = thisHandle;
+            //}
+            //if (EndHandle && i == NodeCount - 2)
+            //{
+            //    node2.CurrentPosition = otherHandle;
+            //}
 
-      
+            node1.wantedPosition = Vector3.zero;
+            // Collision handling.
+            ResolveSphereCollisionForSingleNode(node1);
+            ResolveBoxCollisionForSingleNode(node1);
         }
     }
 
-    private float ResolveSphereCollisionForSingleNode(CableNode cableNode)
+    private void ResolveSphereCollisionForSingleNode(CableNode cableNode)
     {
         foreach (CustomSphereCollider sphereCollider in _customSphereColliders)
         {
@@ -293,18 +327,19 @@ public class CableSolver : MonoBehaviour
             float radius = sphereCollider.Radius;
             if (distance > radius + RopeThickness / 2)
             {
+                // No collision;
                 continue;
             }
 
             // Push point outside circle.
             Vector3 direction = (cableNode.CurrentPosition - sphereCollider.Position);
             Vector3 positionOnSphere = sphereCollider.Position + (direction.normalized * radius) + (direction.normalized * RopeThickness / 2);
+            cableNode.wantedPosition = cableNode.CurrentPosition;
+            cableNode.OldPosition = positionOnSphere;
             cableNode.CurrentPosition = positionOnSphere;
             cableNode.Acceleration = Vector3.zero;
             cableNode.Velocity = Vector3.zero;
-            return 0f;
         }
-        return 1f;
     }
 
     private void ResolveBoxCollisionForSingleNode(CableNode cableNode)
@@ -355,9 +390,9 @@ public class CableSolver : MonoBehaviour
                 localPositionToBoxCollider.z = halfColliderSize.z * sz;
             }
             Vector3 globalPositionToBoxCollider = boxCollider.LocalToWorldMatrix.MultiplyPoint(localPositionToBoxCollider);
+            cableNode.wantedPosition = cableNode.CurrentPosition;
+            cableNode.OldPosition = globalPositionToBoxCollider;
             cableNode.CurrentPosition = globalPositionToBoxCollider;
-            cableNode.Acceleration = Vector3.zero;
-            cableNode.Velocity = Vector3.zero;
         }
     }
 }
