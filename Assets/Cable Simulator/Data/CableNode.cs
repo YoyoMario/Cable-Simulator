@@ -13,10 +13,12 @@ public class CableNode
     public float Distance;
     public float PushPullStrength;
     public Vector3 wantedPosition;
+    public float Elasticity;
+    public bool IsSpecial;
 
     public float NodeDistance;
 
-    public CableNode(Vector3 startPosition, float nodeDistance)
+    public CableNode(Vector3 startPosition, float nodeDistance, float elasticity, bool isSpecial = default)
     {
         CurrentPosition = startPosition;
         OldPosition = CurrentPosition;
@@ -24,5 +26,7 @@ public class CableNode
         Acceleration = Vector3.zero;
         Velocity = Vector3.zero;
         NodeDistance = nodeDistance;
+        Elasticity = elasticity;
+        IsSpecial = isSpecial;
     }
 }
