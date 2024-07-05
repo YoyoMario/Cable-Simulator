@@ -676,7 +676,7 @@ Transform:
   m_GameObject: {fileID: 796634721}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.7926071, y: 2.746448, z: 1.6256808}
+  m_LocalPosition: {x: 1.587, y: 3.355, z: 1.6256808}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -799,6 +799,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 906585454}
+  - component: {fileID: 906585456}
+  - component: {fileID: 906585455}
   m_Layer: 0
   m_Name: End Handle Point
   m_TagString: Untagged
@@ -815,12 +817,59 @@ Transform:
   m_GameObject: {fileID: 906585453}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.147, y: -0.977, z: 0}
+  m_LocalPosition: {x: 2.99, y: 1.87, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &906585455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906585453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61515c3309531e049bedb912da89b1dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RegisterAtStart: 1
+  VirtualPointType: 1
+  NodeIndex: 0
+  CableSolver: {fileID: 1998323041}
+  IsOutOfReach: 0
+  TargetPosition: {x: 0, y: 0, z: 0}
+  ActualPosition: {x: 0, y: 0, z: 0}
+  Velocity: {x: 0, y: 0, z: 0}
+--- !u!54 &906585456
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906585453}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &917102481
 GameObject:
   m_ObjectHideFlags: 0
@@ -946,7 +995,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!81 &963194226
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1156,7 +1205,7 @@ Transform:
   m_GameObject: {fileID: 1158776036}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.142607, y: 5.7364483, z: 1.6256808}
+  m_LocalPosition: {x: 7.52, y: 9.2, z: 1.6256808}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1238,6 +1287,86 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   angularVel: -30
+--- !u!1 &1310236655
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1310236657}
+  - component: {fileID: 1310236658}
+  - component: {fileID: 1310236656}
+  m_Layer: 0
+  m_Name: End Handle Point (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1310236656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310236655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61515c3309531e049bedb912da89b1dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RegisterAtStart: 0
+  VirtualPointType: 0
+  NodeIndex: 119
+  CableSolver: {fileID: 1998323041}
+  IsOutOfReach: 0
+  TargetPosition: {x: 0, y: 0, z: 0}
+  ActualPosition: {x: 0, y: 0, z: 0}
+  Velocity: {x: 0, y: 0, z: 0}
+--- !u!4 &1310236657
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310236655}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.89, y: 2.06, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &1310236658
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310236655}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
 --- !u!1 &1387464156
 GameObject:
   m_ObjectHideFlags: 0
@@ -1498,6 +1627,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1998323042}
+  - component: {fileID: 1998323043}
   - component: {fileID: 1998323041}
   m_Layer: 0
   m_Name: Cable Simulator
@@ -1518,14 +1648,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12defe4488d3f63428d24aceca689b4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SolverCount: 20
-  NodeCount: 60
-  CableThickness: 0.2
-  NodeDistance: 0.2
+  SolverCount: 40
+  NodeCount: 120
+  CableThickness: 0.1
+  NodeDistance: 0.1
+  ColliderNodeDistance: 0.06
   Gravity: 10
-  GravityDampening: 0.9966
+  GravityDampening: 1
   Elasticity: 0.9
-  EndHandle: 1
+  EndHandle: 0
   EndHanlePoint: {fileID: 906585454}
   _collisionHandler:
     SphereColliders:
@@ -1540,6 +1671,18 @@ MonoBehaviour:
     - {fileID: 54510265}
     - {fileID: 1676458924}
   _cableNodes: []
+  _cableColliders: []
+  _cableCollisionInfo:
+    Collisions: []
+    UniqueIndexNeighbours: 
+  _maxDistanceBetweenNodes: 0.11000001
+  VirtualPoints: []
+  totalRopeMass: 1
+  magic: 20
+  totalRopeDistance: 0
+  calculatedForce: {x: 0, y: 0, z: 0}
+  forceStrength: 0
+  MaxStrength: 0.25
 --- !u!4 &1998323042
 Transform:
   m_ObjectHideFlags: 0
@@ -1555,6 +1698,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1998323043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1998323040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bef6d1e57b25a5d4cb53e54476fd9636, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6600287234948149987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1563,6 +1718,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3869485123265241967, guid: e624222b330604540879c609dc8a50fa, type: 3}
+      propertyPath: _deltaTime
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 3869485123265241967, guid: e624222b330604540879c609dc8a50fa, type: 3}
+      propertyPath: TargetFrameCount
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 3869485123265241967, guid: e624222b330604540879c609dc8a50fa, type: 3}
+      propertyPath: _threadSleepTimeMilliseconds
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3895873918486574779, guid: e624222b330604540879c609dc8a50fa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1620,5 +1787,6 @@ SceneRoots:
   - {fileID: 705507995}
   - {fileID: 1998323042}
   - {fileID: 906585454}
+  - {fileID: 1310236657}
   - {fileID: 971870602}
   - {fileID: 6600287234948149987}

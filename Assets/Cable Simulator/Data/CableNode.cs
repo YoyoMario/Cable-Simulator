@@ -10,23 +10,18 @@ public class CableNode
     public Vector3 Acceleration;
     public Vector3 Velocity;
     public float Mass = 0.5f; // in kg
+
+    [Header("Runtime Info:")]
     public float Distance;
     public float PushPullStrength;
-    public Vector3 wantedPosition;
-    public float Elasticity;
-    public bool IsSpecial;
 
-    public float NodeDistance;
-
-    public CableNode(Vector3 startPosition, float nodeDistance, float elasticity, bool isSpecial = default)
+    public CableNode(Vector3 startPosition, float mass)
     {
         CurrentPosition = startPosition;
         OldPosition = CurrentPosition;
         PredictedPosition = CurrentPosition;
         Acceleration = Vector3.zero;
         Velocity = Vector3.zero;
-        NodeDistance = nodeDistance;
-        Elasticity = elasticity;
-        IsSpecial = isSpecial;
+        Mass = mass;
     }
 }

@@ -19,12 +19,35 @@ public class CollisionHandler
         CreateBoxCollidersSnapshot();
     }
 
+    public bool ResolveSphereCollision(Vector3 position, float cableThickness, out Vector3 targetPosition)
+    {
+        bool inCollision = default;
+        targetPosition = Vector3.zero;
+        foreach (SphereColliderData sphereColliderData in _sphereColliderDatas)
+        {
+            float distance = Vector3.Distance(position, sphereColliderData.Position);
+            float radius = sphereColliderData.Radius;
+            if (distance > radius + cableThickness /2)
+            {
+                // No collision;
+                continue;
+            }
+
+            // Push point outside circle.
+            Vector3 direction = (position - sphereColliderData.Position);
+            Vector3 positionOnSphere = sphereColliderData.Position + (direction.normalized * radius) + (direction.normalized * cableThickness / 2);
+            targetPosition = positionOnSphere;
+            inCollision = true;
+        }
+        return inCollision;
+    }
+
     public bool ResolveSphereCollisionForNode(CableNode cableNode, float cableThickness)
     {
         bool inCollision = default;
         foreach (SphereColliderData sphereColliderData in _sphereColliderDatas)
         {
-            float distance = Vector3.Distance(cableNode.CurrentPosition, sphereColliderData.Position);
+            float distance = Vector3.Distance(cableNode.PredictedPosition, sphereColliderData.Position);
             float radius = sphereColliderData.Radius;
             if (distance > radius + cableThickness / 2)
             {
@@ -33,11 +56,9 @@ public class CollisionHandler
             }
 
             // Push point outside circle.
-            Vector3 direction = (cableNode.CurrentPosition - sphereColliderData.Position);
+            Vector3 direction = (cableNode.PredictedPosition - sphereColliderData.Position);
             Vector3 positionOnSphere = sphereColliderData.Position + (direction.normalized * radius) + (direction.normalized * cableThickness / 2);
-            cableNode.wantedPosition = cableNode.CurrentPosition;
-            cableNode.OldPosition = positionOnSphere;
-            cableNode.CurrentPosition = positionOnSphere;
+            cableNode.PredictedPosition= positionOnSphere;
             inCollision = true;
         }
         return inCollision;
@@ -46,7 +67,7 @@ public class CollisionHandler
     {
         foreach (BoxColliderData boxColliderData in _boxColliderDatas)
         {
-            Vector3 localPositionToBoxCollider = boxColliderData.WorldToLocalMatrix.MultiplyPoint(cableNode.CurrentPosition);
+            Vector3 localPositionToBoxCollider = boxColliderData.WorldToLocalMatrix.MultiplyPoint(cableNode.PredictedPosition);
             Vector3 halfColliderSize = boxColliderData.Size * 0.5f;
             halfColliderSize += Vector3.one * cableThickness / 2;
 
@@ -90,9 +111,7 @@ public class CollisionHandler
                 localPositionToBoxCollider.z = halfColliderSize.z * sz;
             }
             Vector3 globalPositionToBoxCollider = boxColliderData.LocalToWorldMatrix.MultiplyPoint(localPositionToBoxCollider);
-            cableNode.wantedPosition = cableNode.CurrentPosition;
-            cableNode.OldPosition = globalPositionToBoxCollider;
-            cableNode.CurrentPosition = globalPositionToBoxCollider;
+            cableNode.PredictedPosition = globalPositionToBoxCollider;
         }
     }
 
