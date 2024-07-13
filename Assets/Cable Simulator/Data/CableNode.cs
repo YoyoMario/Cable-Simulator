@@ -10,6 +10,7 @@ public class CableNode
     public Vector3 Acceleration;
     public Vector3 Velocity;
     public float Mass = 0.5f; // in kg
+    public Vector3 PositionBeforeAdjustment;
 
     [Header("Runtime Info:")]
     public float Distance;

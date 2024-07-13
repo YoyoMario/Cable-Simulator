@@ -1,5 +1,5 @@
+using DeltaReality.NucleusXR.CustomAttributes;
 using System;
-using System.Diagnostics;
 using System.Threading;
 using UnityEditor;
 using UnityEngine;
@@ -17,7 +17,7 @@ public class ThreadManager : MonoBehaviour
     private bool _isThreadRunning = default;
     private Thread _thread = default;
 
-    private bool _isApplicationPaused = default;
+    [SerializeField] private bool _isApplicationPaused = default;
 
     public delegate void ThreadManagerEventHandler(double deltaTime);
     public static event ThreadManagerEventHandler Updated;
@@ -44,12 +44,20 @@ public class ThreadManager : MonoBehaviour
 
     private void OnPauseStateChanged(PauseState pauseState)
     {
-        _isApplicationPaused = pauseState.Equals(PauseState.Paused);
+        //_isApplicationPaused = pauseState.Equals(PauseState.Paused);
     }
 
     private void Update()
     {
-        _isApplicationPaused = EditorApplication.isPaused;
+        //_isApplicationPaused = EditorApplication.isPaused;
+    }
+
+    private bool _step = default;
+
+    [Button]
+    public void Step()
+    {
+        _step = true;
     }
 
     private void ThreadedLoop()
@@ -63,8 +71,9 @@ public class ThreadManager : MonoBehaviour
         DateTime previousFrameTime = DateTime.Now;
         while (_isThreadRunning)
         {
-            if (!_isApplicationPaused)
+            if (!_isApplicationPaused || _step)
             {
+                _step = default;
                 DateTime currentFrameTime = DateTime.Now;
                 float deltaTime = (float)(currentFrameTime - previousFrameTime).TotalSeconds;
                 previousFrameTime = currentFrameTime;
@@ -74,7 +83,7 @@ public class ThreadManager : MonoBehaviour
                 {
                     // Update physics with the calculated deltaTime
                     Updated?.Invoke(deltaTime);
-                }                
+                }
 
                 // Calculate the time to sleep to maintain the frame rate
                 DateTime frameEndTime = DateTime.Now;

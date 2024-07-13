@@ -117,11 +117,8 @@ public class CableSolver : MonoBehaviour
             CableNode cableNode = _cableNodes[i];
             Vector3 newPosition = cableNode.CurrentPosition + (cableNode.Velocity * GravityDampening) + (cableNode.Acceleration * cableNode.Mass * (float)deltaTime);
             cableNode.PredictedPosition = newPosition;
+            cableNode.PositionBeforeAdjustment = newPosition;
         }
-
-        //_cableNodes[0].PredictedPosition = firstHandle;
-        //if (EndHandle) _cableNodes[NodeCount - 1].PredictedPosition = secondHandle;
-        //if (EndHandle) _cableNodes[NodeCount - 1].PredictedPosition = (secondHandle - _cableNodes[NodeCount - 1].PredictedPosition) * (float)deltaTime * magic;
 
         // Solver.
         for (int z = 0; z < SolverCount; z++)
@@ -133,11 +130,6 @@ public class CableSolver : MonoBehaviour
                 CableNode node1 = _cableNodes[i];
                 CableNode node2 = _cableNodes[i + 1];
 
-                //if (i == 0)
-                //{
-                //    _cableNodes[0].PredictedPosition = firstHandle;
-                //    //    //node1.CurrentPosition += (firstHandle - node1.CurrentPosition) * deltaTime * magic;
-                //}
 
                 foreach (CableVirtualPoint cableVirtualPoint in VirtualPoints)
                 {
@@ -170,6 +162,7 @@ public class CableSolver : MonoBehaviour
                     Vector3 neededTranslation = direction * Elasticity * pushPullStrength;
                     node1.PredictedPosition += neededTranslation;
                     node2.PredictedPosition -= neededTranslation;
+                    node1.PositionBeforeAdjustment = node1.PredictedPosition;
                 }
 
                 totalRopeDistance += distance;
@@ -180,10 +173,6 @@ public class CableSolver : MonoBehaviour
                 _collisionHandler.ResolveBoxCollisionForNode(node2, CableThickness);
             }
         }
-
-        //_cableNodes[0].CurrentPosition = firstHandle;
-        //if (EndHandle) _cableNodes[NodeCount - 1].CurrentPosition = secondHandle;
-        //if (EndHandle) _cableNodes[NodeCount - 1].CurrentPosition = (secondHandle - _cableNodes[NodeCount - 1].CurrentPosition) * (float)deltaTime * magic;
 
         for (int i = 0; i < NodeCount; i++)
         {

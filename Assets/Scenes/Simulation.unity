@@ -1720,19 +1720,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3869485123265241967, guid: e624222b330604540879c609dc8a50fa, type: 3}
       propertyPath: _deltaTime
-      value: 0.002
+      value: 0.004
       objectReference: {fileID: 0}
     - target: {fileID: 3869485123265241967, guid: e624222b330604540879c609dc8a50fa, type: 3}
       propertyPath: IterationsCount
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3869485123265241967, guid: e624222b330604540879c609dc8a50fa, type: 3}
       propertyPath: TargetFrameCount
-      value: 500
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 3869485123265241967, guid: e624222b330604540879c609dc8a50fa, type: 3}
       propertyPath: _threadSleepTimeMilliseconds
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3895873918486574779, guid: e624222b330604540879c609dc8a50fa, type: 3}
       propertyPath: m_LocalPosition.x

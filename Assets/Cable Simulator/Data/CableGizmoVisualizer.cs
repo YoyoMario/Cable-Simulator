@@ -37,10 +37,10 @@ public class CableGizmoVisualizer : MonoBehaviour
 
             Gizmos.color = Color.red;
             Gizmos.DrawSphere(CableSolver.CableNodes[i].CurrentPosition, 0.025f);
-            //Gizmos.color = Color.blue;
-            //Gizmos.DrawSphere(CableSolver.CableNodes[i].wantedPosition, 0.02f);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(CableSolver.CableNodes[i].PositionBeforeAdjustment, 0.02f);
             Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(CableSolver.CableNodes[i].CurrentPosition, 0.025f + CableSolver.CableThickness / 2f);
+            Gizmos.DrawWireSphere(CableSolver.CableNodes[i].CurrentPosition, CableSolver.CableThickness);
             //Gizmos.color = Color.cyan;
             //Gizmos.DrawRay(CableSolver.CableNodes[i].CurrentPosition, CableSolver.CableNodes[i].Velocity.normalized);
         }

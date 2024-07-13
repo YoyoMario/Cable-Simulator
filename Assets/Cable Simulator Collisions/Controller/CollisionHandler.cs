@@ -19,29 +19,6 @@ public class CollisionHandler
         CreateBoxCollidersSnapshot();
     }
 
-    public bool ResolveSphereCollision(Vector3 position, float cableThickness, out Vector3 targetPosition)
-    {
-        bool inCollision = default;
-        targetPosition = Vector3.zero;
-        foreach (SphereColliderData sphereColliderData in _sphereColliderDatas)
-        {
-            float distance = Vector3.Distance(position, sphereColliderData.Position);
-            float radius = sphereColliderData.Radius;
-            if (distance > radius + cableThickness /2)
-            {
-                // No collision;
-                continue;
-            }
-
-            // Push point outside circle.
-            Vector3 direction = (position - sphereColliderData.Position);
-            Vector3 positionOnSphere = sphereColliderData.Position + (direction.normalized * radius) + (direction.normalized * cableThickness / 2);
-            targetPosition = positionOnSphere;
-            inCollision = true;
-        }
-        return inCollision;
-    }
-
     public bool ResolveSphereCollisionForNode(CableNode cableNode, float cableThickness)
     {
         bool inCollision = default;
@@ -49,7 +26,7 @@ public class CollisionHandler
         {
             float distance = Vector3.Distance(cableNode.PredictedPosition, sphereColliderData.Position);
             float radius = sphereColliderData.Radius;
-            if (distance > radius + cableThickness / 2)
+            if (distance >= radius + cableThickness)
             {
                 // No collision;
                 continue;
@@ -57,8 +34,8 @@ public class CollisionHandler
 
             // Push point outside circle.
             Vector3 direction = (cableNode.PredictedPosition - sphereColliderData.Position);
-            Vector3 positionOnSphere = sphereColliderData.Position + (direction.normalized * radius) + (direction.normalized * cableThickness / 2);
-            cableNode.PredictedPosition= positionOnSphere;
+            Vector3 positionOnSphere = sphereColliderData.Position + (direction.normalized * radius) + (direction.normalized * cableThickness);
+            cableNode.PredictedPosition = positionOnSphere;
             inCollision = true;
         }
         return inCollision;
